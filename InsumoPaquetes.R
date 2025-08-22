@@ -64,39 +64,41 @@ f_pronos <- function(nombreDF, DF, hf){
 # Funcion que ejecuta los modelos segun especificaciones  ####
 ###################################################################### #
 
-f_inflains <- function(agregado, GB_I0a, AA, FechaIni, AO_INI_f, AO_FIN_f, faltanM, hf, modelos){
+f_inflains <- function(agregado, GB_I0a ,AA, FechaIni, AO_INI_f, AO_FIN_f, faltanM, hf, modelos){
   
   # Variables necesarias para el proceso no definidas en argumentos
   Names0 <- names(GB_I0a)
   #agregado <- Names0[2]
   
   # Ver progreso del vector a corrido en el for
-  ncat <- floor(length(AA)/10)
-  progreso <- 0
+  #ncat <- floor(length(AA)/10)
+  #progreso <- 0
   
   ###################################################################### #
   # Ajuste por estacionalidad ####
   ###################################################################### #
-  GB_saj <- GB_I0a
-  year <- as.numeric(substr(GB_I0a$Fecha[1],1,4))
-  month0 <- as.numeric(substr(GB_I0a$Fecha[1],6,7))
-  frequ <- 12
-  j=2
-  Vtemp <- ts(GB_I0a[,j], start = c(year,month0), 
-              frequency = frequ)
-  
-  m <- seas(Vtemp, transform.function = "auto")
-  
-  # serie ajustada por estacionalidad
-  GB_saj[,j] <- final(m)
+  #if(FitAS){
+    GB_saj <- GB_I0a
+    year <- as.numeric(substr(GB_I0a$Fecha[1],1,4))
+    month0 <- as.numeric(substr(GB_I0a$Fecha[1],6,7))
+    frequ <- 12
+    j=2
+    Vtemp <- ts(GB_I0a[,j], start = c(year,month0), 
+                frequency = frequ)
+    
+    m <- seas(Vtemp, transform.function = "auto")
+    
+    # serie ajustada por estacionalidad
+    GB_saj[,j] <- final(m)
+    GB_saj <- data.frame(GB_saj)
+    #GB_saj$Fecha <- as.character(GB_saj$Fecha)
+    GB_VM <- GB_saj[-1,]
+  #}else GB_VM <- GB_I0a[-1,]
   
   ###################################################################### #
   # Variaciones mensuales ####
   ###################################################################### #
   
-  GB_saj <- data.frame(GB_saj)
-  #GB_saj$Fecha <- as.character(GB_saj$Fecha)
-  GB_VM <- GB_saj[-1,]
   for(j in 2:ncol(GB_saj)) GB_VM[,j] <- GB_saj[2:nrow(GB_saj),j] / GB_saj[1:(nrow(GB_saj)-1),j]
   
   ###################################################################### #
@@ -295,9 +297,9 @@ f_inflains <- function(agregado, GB_I0a, AA, FechaIni, AO_INI_f, AO_FIN_f, falta
     ###################################################################### #
     # Progreso del for  ####
     ###################################################################### #
-    progreso = progreso + 1
-    if (progreso%%ncat == 0) 
-      cat(100*round(progreso/length(AA),1), "% del vector AA corrido ... \n", sep = "")
+    #progreso = progreso + 1
+    #if (progreso%%ncat == 0) 
+    #  cat(100*round(progreso/length(AA),1), "% del vector AA corrido ... \n", sep = "")
   } #for AA
   
   
